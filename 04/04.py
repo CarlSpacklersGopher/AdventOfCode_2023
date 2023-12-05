@@ -27,7 +27,17 @@ def count_wins(winning_numbers: list[int], my_numbers: list[int]) -> int:
 
 def part_2(cards: dict) -> int:
     ''' Solves for part 2.  '''
-    return 0
+    for card_id, value in cards.items():
+        copies, winners, my_numbers = value
+        wins = count_wins(winners, my_numbers)
+        for i in range(1, wins + 1):
+            cards[card_id + i][0] += copies # Increase copies of the subsequent winning tickets.
+
+    copy_count = 0
+    for copies, _, _ in cards.values():
+        copy_count += copies
+    return copy_count
+
 
 if __name__ == "__main__":
 
