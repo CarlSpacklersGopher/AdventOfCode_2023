@@ -13,13 +13,11 @@ def process_input(path: str) -> zip:
 
 def part_1(cards: zip) -> int:
     ''' Solves for part 1. '''
+    # Using sets is fast, but might get weird if we have duplicates in the card's numbers that win
     card_points = []
     for winners, card_numbers in cards:
-        win_count = 0
-        for winning_number in winners:
-            for my_number in card_numbers:
-                if int(winning_number) == int(my_number):
-                    win_count += 1
+        my_numbers = set(card_numbers)
+        win_count = len(my_numbers.intersection(winners))
         card_points.append(0 if win_count == 0 else 2 ** (win_count - 1))
 
     return sum(card_points)
