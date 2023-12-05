@@ -1,2 +1,6 @@
 # Exclude all input.txt files as AoC people don't like those being shared.
 input.txt
+
+# Exclude preference files
+.pylintrc
+.vscode
