@@ -1,5 +1,4 @@
 
-
 def process_input(path: str) -> list[list]:
     ''' Reads the puzzle input. '''
     galaxies = []
@@ -10,69 +9,46 @@ def process_input(path: str) -> list[list]:
                     galaxies.append([line_num, char_num])
     return galaxies
 
-def part_1(galaxies:list[list]) -> int:
-    ''' Solves for Part 1. '''
-    # Expand Universe North-South
-    galaxies.sort(key=lambda galaxy: galaxy[0]) # Sort on rows
-    last_occupied_row = 0
+def cosmic_expansion_onedir(galaxies:list[list], NS_EW:str, expansion:int) -> None:
+    ''' Gets new locations of each galaxy after expansion. Directly modifies galaxies input'''
+    lookup = 0 if NS_EW == 'NS' else 1
+
+    galaxies.sort(key=lambda galaxy: galaxy[lookup]) # Sort on rows/cols for empty detection
+    last_occupied = 0
     cosmic_expansion = 0
     for galaxy in galaxies:
-        current_row = galaxy[0]
-        if current_row - last_occupied_row > 1:
-            cosmic_expansion += current_row - last_occupied_row - 1
-        galaxy[0] += cosmic_expansion
-        last_occupied_row = current_row
+        current = galaxy[lookup]
+        if current - last_occupied > 1:
+            cosmic_expansion += expansion * (current - last_occupied - 1)
+        galaxy[lookup] += cosmic_expansion
+        last_occupied = current
+    return galaxies
 
-    # Expand Universe East-West
-    galaxies.sort(key=lambda galaxy: galaxy[1]) # Sort on cols
-    last_occupied_col = 0
-    cosmic_expansion = 0
-    for galaxy in galaxies:
-        current_col = galaxy[1]
-        if current_col - last_occupied_col > 1:
-            cosmic_expansion += current_col - last_occupied_col - 1
-        galaxy[1] += cosmic_expansion
-        last_occupied_col = current_col
-
-    # Calculate Distances
+def get_total_distance(galaxies: list[list]) -> int:
+    ''' Calculates total distance between all pairs of galaxies, assuming one step up, down, left,
+    or right at a time.  '''
     total_distance = 0
     for idx, start_galaxy in enumerate(galaxies):
         for target_galaxy in galaxies[idx:]:
             total_distance += abs(start_galaxy[0] - target_galaxy[0])
             total_distance += abs(start_galaxy[1] - target_galaxy[1])
     return total_distance
+
+def part_1(galaxies:list[list]) -> int:
+    ''' Solves for Part 1. '''
+    # Expand the universe
+    cosmic_expansion_onedir(galaxies, 'NS', 1)
+    cosmic_expansion_onedir(galaxies, 'EW', 1)
+
+    return get_total_distance(galaxies)
 
 def part_2(galaxies:list[list], expansion:int) -> int:
     ''' Solves for Part 2. '''
-    # Expand Universe North-South
-    galaxies.sort(key=lambda galaxy: galaxy[0]) # Sort on rows
-    last_occupied_row = 0
-    cosmic_expansion = 0
-    for galaxy in galaxies:
-        current_row = galaxy[0]
-        if current_row - last_occupied_row > 1:
-            cosmic_expansion += expansion * (current_row - last_occupied_row - 1)
-        galaxy[0] += cosmic_expansion
-        last_occupied_row = current_row
+    # Expand the universe
+    cosmic_expansion_onedir(galaxies, 'NS', expansion)
+    cosmic_expansion_onedir(galaxies, 'EW', expansion)
 
-    # Expand Universe East-West
-    galaxies.sort(key=lambda galaxy: galaxy[1]) # Sort on cols
-    last_occupied_col = 0
-    cosmic_expansion = 0
-    for galaxy in galaxies:
-        current_col = galaxy[1]
-        if current_col - last_occupied_col > 1:
-            cosmic_expansion += expansion * (current_col - last_occupied_col - 1)
-        galaxy[1] += cosmic_expansion
-        last_occupied_col = current_col
-
-    # Calculate Distances
-    total_distance = 0
-    for idx, start_galaxy in enumerate(galaxies):
-        for target_galaxy in galaxies[idx:]:
-            total_distance += abs(start_galaxy[0] - target_galaxy[0])
-            total_distance += abs(start_galaxy[1] - target_galaxy[1])
-    return total_distance
+    return get_total_distance(galaxies)
 
 if __name__ == '__main__':
     # puzzle_input = process_input('11/test_input.txt')
